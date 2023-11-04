@@ -14,6 +14,7 @@ local.properties
 #Custom
 .idea
 .mvn
+.jpb
 
 # External tool builders
 .externalToolBuilders/
