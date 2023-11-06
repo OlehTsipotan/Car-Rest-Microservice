@@ -16,6 +16,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -154,7 +156,8 @@ public class CarRepositoryTest {
         entityManager.persist(car2);
         entityManager.persist(car3);
 
-        assertEquals(3, carRepository.findAll(null, null, null, null, Pageable.unpaged()).stream().toList().size());
+        assertEquals(3,
+                carRepository.findAll(null, null, null, null, null, Pageable.unpaged()).stream().toList().size());
     }
 
     @Test
@@ -176,7 +179,7 @@ public class CarRepositoryTest {
         entityManager.persist(car4);
 
         List<Car> foundedCars =
-                carRepository.findAll(null, null, "Corolla", null, Pageable.unpaged()).stream().toList();
+                carRepository.findAll(null, null, "Corolla", null, null, Pageable.unpaged()).stream().toList();
 
         assertEquals(2, foundedCars.size());
         assertTrue(foundedCars.contains(car2));
@@ -203,11 +206,77 @@ public class CarRepositoryTest {
         entityManager.persist(car3);
         entityManager.persist(car4);
 
+        List<String> categoryNames = Collections.singletonList(dropTop.getName());
+
         List<Car> foundedCars =
-                carRepository.findAll(make.getName(), 2023, "Corolla", dropTop.getName(), Pageable.unpaged()).stream().toList();
+                carRepository.findAll(make.getName(), 2023, "Corolla", categoryNames, categoryNames.size(),
+                        Pageable.unpaged()).stream().toList();
 
         assertEquals(1, foundedCars.size());
         assertTrue(foundedCars.contains(car3));
+    }
+
+    @Test
+    public void findAll_whenCategoryNameListIsNotNullAndSizeIsNull_success() {
+        Make make = new Make("Toyota");
+        entityManager.persist(make);
+
+        Category sedan = new Category("Sedan");
+        Category dropTop = new Category("Drop-top");
+        entityManager.persist(sedan);
+        entityManager.persist(dropTop);
+
+        Car car1 = Car.builder().make(make).categories(Set.of(sedan)).year(2021).model("Camry").build();
+        Car car2 = Car.builder().make(make).categories(Set.of(sedan)).year(2022).model("Corolla").build();
+        Car car3 = Car.builder().make(make).categories(Set.of(dropTop)).year(2023).model("Corolla").build();
+        Car car4 = Car.builder().make(make).categories(Set.of(sedan)).year(2023).model("Land Cruiser").build();
+
+        entityManager.persist(car1);
+        entityManager.persist(car2);
+        entityManager.persist(car3);
+        entityManager.persist(car4);
+
+        List<String> categoryNames = Collections.singletonList(dropTop.getName());
+
+        List<Car> foundedCars =
+                carRepository.findAll(make.getName(), 2023, "Corolla", categoryNames, null, Pageable.unpaged()).stream()
+                        .toList();
+
+        assertEquals(0, foundedCars.size());
+    }
+
+    @Test
+    public void findAll_whenCategoryNameListHasMultipleElements_success() {
+        Make make = new Make("Toyota");
+        entityManager.persist(make);
+
+        Category sedan = new Category("Sedan");
+        Category dropTop = new Category("Drop-top");
+        Category sport = new Category("sport");
+        entityManager.persist(sedan);
+        entityManager.persist(dropTop);
+        entityManager.persist(sport);
+
+        Car car1 = Car.builder().make(make).categories(Set.of(sedan)).year(2021).model("Camry").build();
+        Car car2 = Car.builder().make(make).categories(Set.of(sedan)).year(2022).model("Corolla").build();
+        Car car3 = Car.builder().make(make).categories(Set.of(dropTop, sedan)).year(2023).model("Corolla").build();
+        Car car4 =
+                Car.builder().make(make).categories(Set.of(dropTop, sedan, sport)).year(2023).model("Corolla").build();
+        Car car5 = Car.builder().make(make).categories(Set.of(sedan)).year(2023).model("Land Cruiser").build();
+
+        entityManager.persist(car1);
+        entityManager.persist(car2);
+        entityManager.persist(car3);
+        entityManager.persist(car4);
+        entityManager.persist(car5);
+
+        List<String> categoryNames = Arrays.asList(dropTop.getName(), sedan.getName());
+
+        List<Car> foundedCars =
+                carRepository.findAll(make.getName(), 2023, "Corolla", categoryNames, categoryNames.size(),
+                        Pageable.unpaged()).stream().toList();
+
+        assertEquals(2, foundedCars.size());
     }
 
 
