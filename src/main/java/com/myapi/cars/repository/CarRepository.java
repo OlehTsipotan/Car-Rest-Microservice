@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -16,7 +17,8 @@ public interface CarRepository extends JpaRepository<Car, UUID> {
             "(?1 IS NULL OR c.make.name = ?1)" +
             "AND (?2 IS NULL OR c.year = ?2) " +
             "AND (?3 IS NULL OR c.model = ?3) " +
-            "AND (?4 IS NULL OR ?4 IN (SELECT cat.name FROM c.categories cat))")
-    Page<Car> findAll(String makeName, Integer year, String model, String categoryName, Pageable pageable);
+            "AND (?4 IS NULL OR (SELECT count(*) FROM c.categories cat WHERE cat.name IN (?4)) = ?5)")
+    Page<Car> findAll(String makeName, Integer year, String model, List<String> categoryNameList,
+                      Integer categoryNameListSize, Pageable pageable);
 
 }
