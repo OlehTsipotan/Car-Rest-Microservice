@@ -1,5 +1,6 @@
 package com.myapi.cars.validation;
 
+import com.myapi.cars.exception.FieldViolation;
 import com.myapi.cars.exception.ValidationException;
 import com.myapi.cars.model.Category;
 import com.myapi.cars.repository.CategoryRepository;
@@ -24,7 +25,7 @@ public class CategoryEntityValidator extends EntityValidator<Category> {
 
     @Override
     public void validate(Category category) {
-        List<String> violations = new ArrayList<>();
+        List<FieldViolation> violations = new ArrayList<>();
         try {
             super.validate(category);
         } catch (ValidationException e) {
@@ -33,7 +34,10 @@ public class CategoryEntityValidator extends EntityValidator<Category> {
 
         Optional<Category> categoryToCheck = categoryRepository.findByName(category.getName());
         if (categoryToCheck.isPresent() && !category.equals(categoryToCheck.get())) {
-            violations.add(String.format("Category with name = %s, already exists.", category.getName()));
+            FieldViolation fieldViolation =
+                    new FieldViolation("name", category.getClass().getSimpleName(), category.getName(),
+                            String.format("Category with name = %s, already exists.", category.getName()));
+            violations.add(fieldViolation);
         }
 
         if (!violations.isEmpty()) {

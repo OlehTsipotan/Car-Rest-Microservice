@@ -1,5 +1,6 @@
 package com.myapi.cars.validation;
 
+import com.myapi.cars.exception.FieldViolation;
 import com.myapi.cars.exception.ValidationException;
 import com.myapi.cars.model.Car;
 import com.myapi.cars.repository.CarRepository;
@@ -21,7 +22,7 @@ public class CarEntityValidator extends EntityValidator<Car> {
 
     @Override
     public void validate(Car car) {
-        List<String> violations = new ArrayList<>();
+        List<FieldViolation> violations = new ArrayList<>();
         try {
             super.validate(car);
         } catch (ValidationException e) {

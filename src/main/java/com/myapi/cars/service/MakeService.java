@@ -31,7 +31,7 @@ public class MakeService {
         execute(() -> {
             makeEntityValidator.validate(make);
             if (make.getId() != null && makeRepository.existsById(make.getId())) {
-                throw new EntityAlreadyExistsException("Make with id" + make.getId() + " already exists");
+                throw new EntityAlreadyExistsException("Make with id = " + make.getId() + " already exists");
             }
             makeRepository.save(make);
         });

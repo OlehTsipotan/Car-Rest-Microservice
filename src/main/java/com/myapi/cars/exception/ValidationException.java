@@ -10,13 +10,13 @@ import java.util.List;
 @Setter
 public class ValidationException extends ServiceException {
 
-    private List<String> violations = new ArrayList<>();
+    private List<FieldViolation> violations = new ArrayList<>();
 
     public ValidationException(String errorMessage) {
         super(errorMessage);
     }
 
-    public ValidationException(String errorMessage, List<String> violations) {
+    public ValidationException(String errorMessage, List<FieldViolation> violations) {
         super(errorMessage);
         this.violations = violations;
     }

@@ -1,5 +1,6 @@
 package com.myapi.cars.validation;
 
+import com.myapi.cars.exception.FieldViolation;
 import com.myapi.cars.exception.ValidationException;
 import com.myapi.cars.model.Make;
 import com.myapi.cars.repository.MakeRepository;
@@ -22,7 +23,7 @@ public class MakeEntityValidator extends EntityValidator<Make> {
 
     @Override
     public void validate(Make make) {
-        List<String> violations = new ArrayList<>();
+        List<FieldViolation> violations = new ArrayList<>();
         try {
             super.validate(make);
         } catch (ValidationException e) {
@@ -31,7 +32,10 @@ public class MakeEntityValidator extends EntityValidator<Make> {
 
         Optional<Make> makeToCheck = makeRepository.findByName(make.getName());
         if (makeToCheck.isPresent() && !make.equals(makeToCheck.get())) {
-            violations.add(String.format("Make with name = %s, already exists.", make.getName()));
+            FieldViolation fieldViolation =
+                    new FieldViolation("name", make.getClass().getSimpleName(), make.getName(),
+                            String.format("Make with name = %s, already exists.", make.getName()));
+            violations.add(fieldViolation);
         }
 
         if (!violations.isEmpty()) {
