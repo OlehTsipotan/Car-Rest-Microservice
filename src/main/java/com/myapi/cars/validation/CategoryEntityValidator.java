@@ -4,6 +4,7 @@ import com.myapi.cars.exception.ValidationException;
 import com.myapi.cars.model.Category;
 import com.myapi.cars.repository.CategoryRepository;
 import jakarta.validation.Validator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@Slf4j
 public class CategoryEntityValidator extends EntityValidator<Category> {
 
     private final CategoryRepository categoryRepository;
@@ -35,7 +37,8 @@ public class CategoryEntityValidator extends EntityValidator<Category> {
         }
 
         if (!violations.isEmpty()) {
-            throw new ValidationException("Make is not valid", violations);
+            log.info(violations.toString());
+            throw new ValidationException("Category is not valid", violations);
         }
 
     }
