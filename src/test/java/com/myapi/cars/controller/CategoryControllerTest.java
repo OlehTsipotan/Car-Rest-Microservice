@@ -28,13 +28,12 @@ public class CategoryControllerTest {
     @Test
     void create_success_shouldGiveStatusIsOk() throws Exception {
         Category category = new Category("testCategory");
-//        category.setCategoryId(123);
 
-        when(categoryService.create(any(Category.class))).thenReturn(category.getId());
+        when(categoryService.create(any(Category.class))).thenReturn(1L);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON).content(new ObjectMapper().writeValueAsString(category)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").value(1));
+                .andExpect(MockMvcResultMatchers.jsonPath("$").value(1L));
     }
 }
