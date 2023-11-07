@@ -24,7 +24,7 @@ public class Car {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "car_id", nullable = false)
+    @Column(name = "car_id")
     private UUID id;
 
     @NotNull(message = "Car name must not be null")

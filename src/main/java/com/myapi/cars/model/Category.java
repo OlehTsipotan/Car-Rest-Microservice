@@ -18,9 +18,9 @@ import java.util.Objects;
 public class Category {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")
-    @SequenceGenerator(name = "category_seq")
-    @Column(name = "category_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_generator")
+    @SequenceGenerator(name = "category_generator", sequenceName = "category_seq", allocationSize = 1)
+    @Column(name = "category_id")
     private Long id;
 
     @NotBlank(message = "Category name must not be blank")

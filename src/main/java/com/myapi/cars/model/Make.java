@@ -20,7 +20,7 @@ public class Make {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "make_generator")
     @SequenceGenerator(name = "make_generator", sequenceName = "make_seq", allocationSize = 1)
-    @Column(name = "make_id", nullable = false)
+    @Column(name = "make_id")
     private Long id;
 
     @NotBlank(message = "Make name must not be blank")
