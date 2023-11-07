@@ -41,7 +41,7 @@ public class CarService {
     }
 
     @Transactional
-    public UUID update(@NonNull Car car) {
+    public Car update(@NonNull Car car) {
         execute(() -> {
             carEntityValidator.validate(car);
             if (car.getId() == null || !carRepository.existsById(car.getId())) {
@@ -50,7 +50,7 @@ public class CarService {
             carRepository.save(car);
         });
         log.info("updated {}", car);
-        return car.getId();
+        return car;
     }
 
     @Transactional
@@ -77,6 +77,13 @@ public class CarService {
                         pageable)).stream().toList();
         log.debug("Retrieved All {} Cars", cars.size());
         return cars;
+    }
+
+    public Car findById(@NonNull UUID id) {
+        Car car = execute(() -> carRepository.findById(id)
+                .orElseThrow(() -> new EntityDoesNotExistsException("There is no Make with id = " + id)));
+        log.debug("Retrieved Car by id = {}", id);
+        return car;
     }
 
     private <T> T execute(DaoSupplier<T> supplier) {

@@ -40,7 +40,7 @@ public class MakeService {
     }
 
     @Transactional
-    public Long update(@NonNull Make make) {
+    public Make update(@NonNull Make make) {
         execute(() -> {
             makeEntityValidator.validate(make);
             if (make.getId() == null || !makeRepository.existsById(make.getId())) {
@@ -49,7 +49,7 @@ public class MakeService {
             makeRepository.save(make);
         });
         log.info("updated {}", make);
-        return make.getId();
+        return make;
     }
 
     @Transactional
@@ -67,6 +67,13 @@ public class MakeService {
         List<Make> makes = execute(() -> makeRepository.findAll(pageable)).stream().toList();
         log.debug("Retrieved All {} Makes", makes.size());
         return makes;
+    }
+
+    public Make findById(@NonNull Long id) {
+        Make make = execute(() -> makeRepository.findById(id)
+                .orElseThrow(() -> new EntityDoesNotExistsException("There is no Make with id = " + id)));
+        log.debug("Retrieved Make by id = {}", id);
+        return make;
     }
 
     private <T> T execute(DaoSupplier<T> supplier) {

@@ -40,7 +40,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public Long update(@NonNull Category category) {
+    public Category update(@NonNull Category category) {
         execute(() -> {
             categoryEntityValidator.validate(category);
             if (category.getId() == null || !categoryRepository.existsById(category.getId())) {
@@ -49,7 +49,7 @@ public class CategoryService {
             categoryRepository.save(category);
         });
         log.info("updated {}", category);
-        return category.getId();
+        return category;
     }
 
     @Transactional
@@ -67,6 +67,13 @@ public class CategoryService {
         List<Category> categories = execute(() -> categoryRepository.findAll(pageable)).stream().toList();
         log.debug("Retrieved All {} Categories", categories.size());
         return categories;
+    }
+
+    public Category findById(@NonNull Long id) {
+        Category category = execute(() -> categoryRepository.findById(id)
+                .orElseThrow(() -> new EntityDoesNotExistsException("There is no Category with id = " + id)));
+        log.debug("Retrieved Category {}", category);
+        return category;
     }
 
     private <T> T execute(com.myapi.cars.service.MakeService.DaoSupplier<T> supplier) {

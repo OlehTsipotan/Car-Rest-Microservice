@@ -135,7 +135,7 @@ public class CategoryServiceTest {
 
         Category category = new Category();
         category.setId(1L);
-        assertEquals(category.getId(), categoryService.update(category));
+        assertEquals(category, categoryService.update(category));
 
         verify(categoryRepository).save(category);
         verify(categoryEntityValidator).validate(category);

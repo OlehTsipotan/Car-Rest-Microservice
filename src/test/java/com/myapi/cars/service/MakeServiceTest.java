@@ -139,7 +139,7 @@ public class MakeServiceTest {
 
         Make make = new Make();
         make.setId(1L);
-        assertEquals(make.getId(), makeService.update(make));
+        assertEquals(make, makeService.update(make));
 
         verify(makeRepository).save(make);
         verify(makeEntityValidator).validate(make);

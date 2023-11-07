@@ -132,7 +132,7 @@ public class CarServiceTest {
         when(carRepository.existsById(any())).thenReturn(true);
 
         Car car = Car.builder().id(UUID.randomUUID()).build();
-        assertEquals(car.getId(), carService.update(car));
+        assertEquals(car, carService.update(car));
 
         verify(carRepository).save(car);
         verify(carEntityValidator).validate(car);
