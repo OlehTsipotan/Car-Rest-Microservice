@@ -72,7 +72,10 @@ public class CategoryServiceTest {
     public void create_whenEntityAlreadyExists_throwEntityAlreadyExistsException() {
         when(categoryRepository.existsById(any())).thenReturn(true);
 
-        assertThrows(EntityAlreadyExistsException.class, () -> categoryService.create(new Category()));
+        Category category = new Category();
+        category.setId(1L);
+
+        assertThrows(EntityAlreadyExistsException.class, () -> categoryService.create(category));
 
         verify(categoryEntityValidator).validate(any());
     }
@@ -100,7 +103,10 @@ public class CategoryServiceTest {
         when(categoryRepository.existsById(any())).thenReturn(true);
         doThrow(BadJpqlGrammarException.class).when(categoryRepository).save(any());
 
-        assertThrows(ServiceException.class, () -> categoryService.update(new Category()));
+        Category category = new Category();
+        category.setId(1L);
+
+        assertThrows(ServiceException.class, () -> categoryService.update(category));
 
         verify(categoryRepository).save(any());
     }
@@ -128,6 +134,7 @@ public class CategoryServiceTest {
         when(categoryRepository.existsById(any())).thenReturn(true);
 
         Category category = new Category();
+        category.setId(1L);
         assertEquals(category.getId(), categoryService.update(category));
 
         verify(categoryRepository).save(category);

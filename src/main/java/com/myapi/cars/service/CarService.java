@@ -31,8 +31,8 @@ public class CarService {
     public UUID create(@NonNull Car car) {
         execute(() -> {
             carEntityValidator.validate(car);
-            if (carRepository.existsById(car.getId())) {
-                throw new EntityAlreadyExistsException("Car with id" + car.getId() + " already exists");
+            if (car.getId() != null && carRepository.existsById(car.getId())) {
+                throw new EntityAlreadyExistsException("Car with id = " + car.getId() + " already exists");
             }
             carRepository.save(car);
         });
@@ -44,8 +44,8 @@ public class CarService {
     public UUID update(@NonNull Car car) {
         execute(() -> {
             carEntityValidator.validate(car);
-            if (!carRepository.existsById(car.getId())) {
-                throw new EntityDoesNotExistsException("Car with id" + car.getId() + " already exists");
+            if (car.getId() == null || !carRepository.existsById(car.getId())) {
+                throw new EntityDoesNotExistsException("Car with id = " + car.getId() + " do not exists");
             }
             carRepository.save(car);
         });
@@ -57,7 +57,7 @@ public class CarService {
     public void deleteById(@NonNull UUID id) {
         execute(() -> {
             if (!carRepository.existsById(id)) {
-                throw new EntityDoesNotExistsException("There is no Authority to delete with id = " + id);
+                throw new EntityDoesNotExistsException("There is no Car to delete with id = " + id);
             }
             carRepository.deleteById(id);
         });

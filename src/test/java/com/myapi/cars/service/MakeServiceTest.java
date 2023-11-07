@@ -73,7 +73,10 @@ public class MakeServiceTest {
     public void create_whenEntityAlreadyExists_throwEntityAlreadyExistsException() {
         when(makeRepository.existsById(any())).thenReturn(true);
 
-        assertThrows(EntityAlreadyExistsException.class, () -> makeService.create(new Make()));
+        Make make = new Make();
+        make.setId(1L);
+
+        assertThrows(EntityAlreadyExistsException.class, () -> makeService.create(make));
 
         verify(makeEntityValidator).validate(any());
     }
@@ -101,7 +104,10 @@ public class MakeServiceTest {
         when(makeRepository.existsById(any())).thenReturn(true);
         doThrow(BadJpqlGrammarException.class).when(makeRepository).save(any());
 
-        assertThrows(ServiceException.class, () -> makeService.update(new Make()));
+        Make make = new Make();
+        make.setId(1L);
+
+        assertThrows(ServiceException.class, () -> makeService.update(make));
 
         verify(makeRepository).save(any());
     }
@@ -110,7 +116,10 @@ public class MakeServiceTest {
     public void update_whenValidatorThrowsValidationException_throwValidationException() {
         doThrow(ValidationException.class).when(makeEntityValidator).validate(any());
 
-        assertThrows(ValidationException.class, () -> makeService.update(new Make()));
+        Make make = new Make();
+        make.setId(1L);
+
+        assertThrows(ValidationException.class, () -> makeService.update(make));
 
         verify(makeEntityValidator).validate(any());
     }
@@ -129,6 +138,7 @@ public class MakeServiceTest {
         when(makeRepository.existsById(any())).thenReturn(true);
 
         Make make = new Make();
+        make.setId(1L);
         assertEquals(make.getId(), makeService.update(make));
 
         verify(makeRepository).save(make);

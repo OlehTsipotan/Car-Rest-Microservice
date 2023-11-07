@@ -30,7 +30,7 @@ public class MakeService {
     public Long create(@NonNull Make make) {
         execute(() -> {
             makeEntityValidator.validate(make);
-            if (makeRepository.existsById(make.getId())) {
+            if (make.getId() != null && makeRepository.existsById(make.getId())) {
                 throw new EntityAlreadyExistsException("Make with id" + make.getId() + " already exists");
             }
             makeRepository.save(make);
@@ -43,8 +43,8 @@ public class MakeService {
     public Long update(@NonNull Make make) {
         execute(() -> {
             makeEntityValidator.validate(make);
-            if (!makeRepository.existsById(make.getId())) {
-                throw new EntityDoesNotExistsException("Make with id" + make.getId() + " already exists");
+            if (make.getId() == null || !makeRepository.existsById(make.getId())) {
+                throw new EntityDoesNotExistsException("Make with id = " + make.getId() + " do not exists");
             }
             makeRepository.save(make);
         });

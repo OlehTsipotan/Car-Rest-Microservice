@@ -72,7 +72,9 @@ public class CarServiceTest {
     public void create_whenEntityAlreadyExists_throwEntityAlreadyExistsException() {
         when(carRepository.existsById(any())).thenReturn(true);
 
-        assertThrows(EntityAlreadyExistsException.class, () -> carService.create(new Car()));
+        Car car = Car.builder().id(UUID.randomUUID()).build();
+
+        assertThrows(EntityAlreadyExistsException.class, () -> carService.create(car));
 
         verify(carEntityValidator).validate(any());
     }
@@ -100,7 +102,9 @@ public class CarServiceTest {
         when(carRepository.existsById(any())).thenReturn(true);
         doThrow(BadJpqlGrammarException.class).when(carRepository).save(any());
 
-        assertThrows(ServiceException.class, () -> carService.update(new Car()));
+        Car car = Car.builder().id(UUID.randomUUID()).build();
+
+        assertThrows(ServiceException.class, () -> carService.update(car));
 
         verify(carRepository).save(any());
     }
@@ -127,7 +131,7 @@ public class CarServiceTest {
     public void update_success() {
         when(carRepository.existsById(any())).thenReturn(true);
 
-        Car car = new Car();
+        Car car = Car.builder().id(UUID.randomUUID()).build();
         assertEquals(car.getId(), carService.update(car));
 
         verify(carRepository).save(car);

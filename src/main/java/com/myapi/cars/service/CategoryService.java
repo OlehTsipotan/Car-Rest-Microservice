@@ -30,8 +30,8 @@ public class CategoryService {
     public Long create(@NonNull Category category) {
         execute(() -> {
             categoryEntityValidator.validate(category);
-            if (categoryRepository.existsById(category.getId())) {
-                throw new EntityAlreadyExistsException("Category with id" + category.getId() + " already exists");
+            if (category.getId() != null && categoryRepository.existsById(category.getId())) {
+                throw new EntityAlreadyExistsException("Category with id = " + category.getId() + " already exists");
             }
             categoryRepository.save(category);
         });
@@ -43,8 +43,8 @@ public class CategoryService {
     public Long update(@NonNull Category category) {
         execute(() -> {
             categoryEntityValidator.validate(category);
-            if (!categoryRepository.existsById(category.getId())) {
-                throw new EntityDoesNotExistsException("Category with id" + category.getId() + " already exists");
+            if (category.getId() == null || !categoryRepository.existsById(category.getId())) {
+                throw new EntityDoesNotExistsException("Category with id = " + category.getId() + " do not exists");
             }
             categoryRepository.save(category);
         });
