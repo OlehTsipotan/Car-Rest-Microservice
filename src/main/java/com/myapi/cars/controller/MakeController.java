@@ -6,6 +6,7 @@ import com.myapi.cars.utility.PaginationSortingUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +21,9 @@ public class MakeController {
     private final MakeService makeService;
 
     @PostMapping
-    public ResponseEntity<Long> create(@RequestBody Make Make) {
-        Long id = makeService.create(Make);
-        return ResponseEntity.ok(id);
+    public ResponseEntity<Long> create(@RequestBody Make make) {
+        Long id = makeService.create(make);
+        return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
     @DeleteMapping("/{makeId}")
@@ -31,16 +32,16 @@ public class MakeController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
-    public ResponseEntity<Make> update(@RequestBody Make Make) {
-        Make updatedMake = makeService.update(Make);
+    @PatchMapping
+    public ResponseEntity<Make> update(@RequestBody Make make) {
+        Make updatedMake = makeService.update(make);
         return ResponseEntity.ok(updatedMake);
     }
 
     @GetMapping("/{makeId}")
     public ResponseEntity<Make> getById(@PathVariable Long makeId) {
-        Make Make = makeService.findById(makeId);
-        return ResponseEntity.ok(Make);
+        Make make = makeService.findById(makeId);
+        return ResponseEntity.ok(make);
     }
 
     @GetMapping

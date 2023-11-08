@@ -6,6 +6,7 @@ import com.myapi.cars.utility.PaginationSortingUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,27 +24,27 @@ public class CarController {
     private final CarService CarService;
 
     @PostMapping
-    public ResponseEntity<UUID> create(@RequestBody Car Car) {
-        UUID id = CarService.create(Car);
-        return ResponseEntity.ok(id);
+    public ResponseEntity<Long> create(@RequestBody Car car) {
+        Long id = CarService.create(car);
+        return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
     @DeleteMapping("/{carId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID carId) {
+    public ResponseEntity<Void> delete(@PathVariable Long carId) {
         CarService.deleteById(carId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
-    public ResponseEntity<Car> update(@RequestBody Car Car) {
-        Car updatedCar = CarService.update(Car);
+    public ResponseEntity<Car> update(@RequestBody Car car) {
+        Car updatedCar = CarService.update(car);
         return ResponseEntity.ok(updatedCar);
     }
 
     @GetMapping("/{carId}")
-    public ResponseEntity<Car> getById(@PathVariable UUID carId) {
-        Car Car = CarService.findById(carId);
-        return ResponseEntity.ok(Car);
+    public ResponseEntity<Car> getById(@PathVariable Long carId) {
+        Car car = CarService.findById(carId);
+        return ResponseEntity.ok(car);
     }
 
     @GetMapping

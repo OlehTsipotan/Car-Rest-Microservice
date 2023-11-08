@@ -1,7 +1,7 @@
 package com.myapi.cars.service;
 
 import com.myapi.cars.exception.EntityAlreadyExistsException;
-import com.myapi.cars.exception.EntityDoesNotExistsException;
+import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
 import com.myapi.cars.model.Category;
 import com.myapi.cars.repository.CategoryRepository;
@@ -44,7 +44,7 @@ public class CategoryService {
         execute(() -> {
             categoryEntityValidator.validate(category);
             if (category.getId() == null || !categoryRepository.existsById(category.getId())) {
-                throw new EntityDoesNotExistsException("Category with id = " + category.getId() + " do not exists");
+                throw new EntityNotFoundException("Category with id = " + category.getId() + " do not exists");
             }
             categoryRepository.save(category);
         });
@@ -56,7 +56,7 @@ public class CategoryService {
     public void deleteById(@NonNull Long id) {
         execute(() -> {
             if (!categoryRepository.existsById(id)) {
-                throw new EntityDoesNotExistsException("There is no Category to delete with id = " + id);
+                throw new EntityNotFoundException("There is no Category to delete with id = " + id);
             }
             categoryRepository.deleteById(id);
         });
@@ -71,7 +71,7 @@ public class CategoryService {
 
     public Category findById(@NonNull Long id) {
         Category category = execute(() -> categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityDoesNotExistsException("There is no Category with id = " + id)));
+                .orElseThrow(() -> new EntityNotFoundException("There is no Category with id = " + id)));
         log.debug("Retrieved Category {}", category);
         return category;
     }

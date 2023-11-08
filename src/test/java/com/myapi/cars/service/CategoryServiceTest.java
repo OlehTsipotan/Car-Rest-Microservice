@@ -1,7 +1,7 @@
 package com.myapi.cars.service;
 
 import com.myapi.cars.exception.EntityAlreadyExistsException;
-import com.myapi.cars.exception.EntityDoesNotExistsException;
+import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
 import com.myapi.cars.exception.ValidationException;
 import com.myapi.cars.model.Category;
@@ -124,7 +124,7 @@ public class CategoryServiceTest {
     public void update_whenEntityDoesNotExists_throwEntityAlreadyExistsException() {
         when(categoryRepository.existsById(any())).thenReturn(false);
 
-        assertThrows(EntityDoesNotExistsException.class, () -> categoryService.update(new Category()));
+        assertThrows(EntityNotFoundException.class, () -> categoryService.update(new Category()));
 
         verify(categoryEntityValidator).validate(any());
     }
@@ -154,7 +154,7 @@ public class CategoryServiceTest {
     public void deleteById_whenEntityDoesNotExists_throwEntityDoesNotExistsException() {
         when(categoryRepository.existsById(any())).thenReturn(false);
 
-        assertThrows(EntityDoesNotExistsException.class, () -> categoryService.deleteById(1L));
+        assertThrows(EntityNotFoundException.class, () -> categoryService.deleteById(1L));
 
         verify(categoryRepository).existsById(any());
     }

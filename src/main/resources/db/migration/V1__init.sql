@@ -1,10 +1,12 @@
+CREATE SEQUENCE IF NOT EXISTS car_seq START WITH 1 INCREMENT BY 1;
+
 CREATE SEQUENCE IF NOT EXISTS category_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE IF NOT EXISTS make_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE car
 (
-    car_id  UUID         NOT NULL,
+    car_id  BIGINT       NOT NULL,
     make_id BIGINT       NOT NULL,
     year    INTEGER      NOT NULL,
     model   VARCHAR(255) NOT NULL,
@@ -13,7 +15,7 @@ CREATE TABLE car
 
 CREATE TABLE cars_categories
 (
-    car_id      UUID   NOT NULL,
+    car_id      BIGINT NOT NULL,
     category_id BIGINT NOT NULL,
     CONSTRAINT pk_cars_categories PRIMARY KEY (car_id, category_id)
 );

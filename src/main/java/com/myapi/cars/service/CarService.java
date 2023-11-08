@@ -1,7 +1,7 @@
 package com.myapi.cars.service;
 
 import com.myapi.cars.exception.EntityAlreadyExistsException;
-import com.myapi.cars.exception.EntityDoesNotExistsException;
+import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
 import com.myapi.cars.model.Car;
 import com.myapi.cars.repository.CarRepository;
@@ -28,7 +28,7 @@ public class CarService {
     private final CarEntityValidator carEntityValidator;
 
     @Transactional
-    public UUID create(@NonNull Car car) {
+    public Long create(@NonNull Car car) {
         execute(() -> {
             carEntityValidator.validate(car);
             if (car.getId() != null && carRepository.existsById(car.getId())) {
@@ -45,7 +45,7 @@ public class CarService {
         execute(() -> {
             carEntityValidator.validate(car);
             if (car.getId() == null || !carRepository.existsById(car.getId())) {
-                throw new EntityDoesNotExistsException("Car with id = " + car.getId() + " do not exists");
+                throw new EntityNotFoundException("Car with id = " + car.getId() + " do not exists");
             }
             carRepository.save(car);
         });
@@ -54,10 +54,10 @@ public class CarService {
     }
 
     @Transactional
-    public void deleteById(@NonNull UUID id) {
+    public void deleteById(@NonNull Long id) {
         execute(() -> {
             if (!carRepository.existsById(id)) {
-                throw new EntityDoesNotExistsException("There is no Car to delete with id = " + id);
+                throw new EntityNotFoundException("There is no Car to delete with id = " + id);
             }
             carRepository.deleteById(id);
         });
@@ -79,9 +79,9 @@ public class CarService {
         return cars;
     }
 
-    public Car findById(@NonNull UUID id) {
+    public Car findById(@NonNull Long id) {
         Car car = execute(() -> carRepository.findById(id)
-                .orElseThrow(() -> new EntityDoesNotExistsException("There is no Make with id = " + id)));
+                .orElseThrow(() -> new EntityNotFoundException("There is no Make with id = " + id)));
         log.debug("Retrieved Car by id = {}", id);
         return car;
     }

@@ -10,7 +10,6 @@ import org.hibernate.proxy.HibernateProxy;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -23,9 +22,10 @@ import java.util.UUID;
 public class Car {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_generator")
+    @SequenceGenerator(name = "car_generator", sequenceName = "car_seq", allocationSize = 1)
     @Column(name = "car_id")
-    private UUID id;
+    private Long id;
 
     @NotNull(message = "Car name must not be null")
     @ManyToOne

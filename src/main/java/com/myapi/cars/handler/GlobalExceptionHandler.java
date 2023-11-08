@@ -3,7 +3,7 @@ package com.myapi.cars.handler;
 import com.myapi.cars.error.ApiError;
 import com.myapi.cars.error.ApiValidationError;
 import com.myapi.cars.exception.EntityAlreadyExistsException;
-import com.myapi.cars.exception.EntityDoesNotExistsException;
+import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +34,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
-    @ExceptionHandler(EntityDoesNotExistsException.class)
+    @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityDoesNotExistsException(
-            EntityDoesNotExistsException entityDoesNotExistsException) {
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, entityDoesNotExistsException.getMessage(), entityDoesNotExistsException);
+            EntityNotFoundException entityNotFoundException) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, entityNotFoundException.getMessage(),
+                entityNotFoundException);
         return ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 

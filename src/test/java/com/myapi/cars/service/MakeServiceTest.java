@@ -1,7 +1,7 @@
 package com.myapi.cars.service;
 
 import com.myapi.cars.exception.EntityAlreadyExistsException;
-import com.myapi.cars.exception.EntityDoesNotExistsException;
+import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
 import com.myapi.cars.exception.ValidationException;
 import com.myapi.cars.model.Make;
@@ -128,7 +128,7 @@ public class MakeServiceTest {
     public void update_whenEntityDoesNotExists_throwEntityAlreadyExistsException() {
         when(makeRepository.existsById(any())).thenReturn(false);
 
-        assertThrows(EntityDoesNotExistsException.class, () -> makeService.update(new Make()));
+        assertThrows(EntityNotFoundException.class, () -> makeService.update(new Make()));
 
         verify(makeEntityValidator).validate(any());
     }
@@ -158,7 +158,7 @@ public class MakeServiceTest {
     public void deleteById_whenEntityDoesNotExists_throwEntityDoesNotExistsException() {
         when(makeRepository.existsById(any())).thenReturn(false);
 
-        assertThrows(EntityDoesNotExistsException.class, () -> makeService.deleteById(1L));
+        assertThrows(EntityNotFoundException.class, () -> makeService.deleteById(1L));
 
         verify(makeRepository).existsById(any());
     }

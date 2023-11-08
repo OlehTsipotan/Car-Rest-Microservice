@@ -37,7 +37,7 @@ public class CarEntityValidatorTest {
     public void validate_whenCarIsValid() {
         Category category = new Category(1L, "name");
         Make make = new Make(1L, "name");
-        Car car = Car.builder().id(UUID.randomUUID()).year(2003).model("some Model").categories(Set.of(category))
+        Car car = Car.builder().id(1L).year(2003).model("some Model").categories(Set.of(category))
                 .make(make).build();
         assertDoesNotThrow(() -> validator.validate(car));
     }

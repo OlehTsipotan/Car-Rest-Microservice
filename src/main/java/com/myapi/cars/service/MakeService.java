@@ -1,7 +1,7 @@
 package com.myapi.cars.service;
 
 import com.myapi.cars.exception.EntityAlreadyExistsException;
-import com.myapi.cars.exception.EntityDoesNotExistsException;
+import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
 import com.myapi.cars.model.Make;
 import com.myapi.cars.repository.MakeRepository;
@@ -44,7 +44,7 @@ public class MakeService {
         execute(() -> {
             makeEntityValidator.validate(make);
             if (make.getId() == null || !makeRepository.existsById(make.getId())) {
-                throw new EntityDoesNotExistsException("Make with id = " + make.getId() + " do not exists");
+                throw new EntityNotFoundException("Make with id = " + make.getId() + " do not exists");
             }
             makeRepository.save(make);
         });
@@ -56,7 +56,7 @@ public class MakeService {
     public void deleteById(@NonNull Long id) {
         execute(() -> {
             if (!makeRepository.existsById(id)) {
-                throw new EntityDoesNotExistsException("There is no Make to delete with id = " + id);
+                throw new EntityNotFoundException("There is no Make to delete with id = " + id);
             }
             makeRepository.deleteById(id);
         });
@@ -71,7 +71,7 @@ public class MakeService {
 
     public Make findById(@NonNull Long id) {
         Make make = execute(() -> makeRepository.findById(id)
-                .orElseThrow(() -> new EntityDoesNotExistsException("There is no Make with id = " + id)));
+                .orElseThrow(() -> new EntityNotFoundException("There is no Make with id = " + id)));
         log.debug("Retrieved Make by id = {}", id);
         return make;
     }

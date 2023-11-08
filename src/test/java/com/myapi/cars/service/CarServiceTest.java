@@ -1,7 +1,7 @@
 package com.myapi.cars.service;
 
 import com.myapi.cars.exception.EntityAlreadyExistsException;
-import com.myapi.cars.exception.EntityDoesNotExistsException;
+import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
 import com.myapi.cars.exception.ValidationException;
 import com.myapi.cars.model.Car;
@@ -72,7 +72,7 @@ public class CarServiceTest {
     public void create_whenEntityAlreadyExists_throwEntityAlreadyExistsException() {
         when(carRepository.existsById(any())).thenReturn(true);
 
-        Car car = Car.builder().id(UUID.randomUUID()).build();
+        Car car = Car.builder().id(1L).build();
 
         assertThrows(EntityAlreadyExistsException.class, () -> carService.create(car));
 
@@ -102,7 +102,7 @@ public class CarServiceTest {
         when(carRepository.existsById(any())).thenReturn(true);
         doThrow(BadJpqlGrammarException.class).when(carRepository).save(any());
 
-        Car car = Car.builder().id(UUID.randomUUID()).build();
+        Car car = Car.builder().id(1L).build();
 
         assertThrows(ServiceException.class, () -> carService.update(car));
 
@@ -122,7 +122,7 @@ public class CarServiceTest {
     public void update_whenEntityDoesNotExists_throwEntityAlreadyExistsException() {
         when(carRepository.existsById(any())).thenReturn(false);
 
-        assertThrows(EntityDoesNotExistsException.class, () -> carService.update(new Car()));
+        assertThrows(EntityNotFoundException.class, () -> carService.update(new Car()));
 
         verify(carEntityValidator).validate(any());
     }
@@ -131,7 +131,7 @@ public class CarServiceTest {
     public void update_success() {
         when(carRepository.existsById(any())).thenReturn(true);
 
-        Car car = Car.builder().id(UUID.randomUUID()).build();
+        Car car = Car.builder().id(1L).build();
         assertEquals(car, carService.update(car));
 
         verify(carRepository).save(car);
@@ -142,7 +142,7 @@ public class CarServiceTest {
     public void deleteById_whenRepositoryThrowsExceptionExtendsDataAccessException_throwServiceException() {
         doThrow(BadJpqlGrammarException.class).when(carRepository).deleteById(any());
 
-        assertThrows(ServiceException.class, () -> carService.deleteById(UUID.randomUUID()));
+        assertThrows(ServiceException.class, () -> carService.deleteById(1L));
 
         verify(carRepository).existsById(any());
     }
@@ -151,14 +151,14 @@ public class CarServiceTest {
     public void deleteById_whenEntityDoesNotExists_throwEntityDoesNotExistsException() {
         when(carRepository.existsById(any())).thenReturn(false);
 
-        assertThrows(EntityDoesNotExistsException.class, () -> carService.deleteById(UUID.randomUUID()));
+        assertThrows(EntityNotFoundException.class, () -> carService.deleteById(1L));
 
         verify(carRepository).existsById(any());
     }
 
     @ParameterizedTest
     @NullSource
-    public void deleteById_whenIdIsNull_throwIllegalArgumentException(UUID nullId) {
+    public void deleteById_whenIdIsNull_throwIllegalArgumentException(Long nullId) {
         assertThrows(IllegalArgumentException.class, () -> carService.deleteById(nullId));
 
         verifyNoInteractions(carRepository);
@@ -168,7 +168,7 @@ public class CarServiceTest {
     public void deleteById_success() {
         when(carRepository.existsById(any())).thenReturn(true);
 
-        carService.deleteById(UUID.randomUUID());
+        carService.deleteById(1L);
 
         verify(carRepository).deleteById(any());
     }
