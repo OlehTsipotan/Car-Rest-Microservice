@@ -1,52 +1,51 @@
 package com.myapi.cars.handler;
 
-import com.myapi.cars.error.ApiError;
-import com.myapi.cars.error.ApiValidationError;
 import com.myapi.cars.exception.EntityAlreadyExistsException;
 import com.myapi.cars.exception.EntityNotFoundException;
+import com.myapi.cars.exception.ServiceException;
 import com.myapi.cars.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-/*
-    Useless, but I'm keeping it for reference
-*/
+import java.time.Instant;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> handleRuntimeException(RuntimeException runtimeException) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_GATEWAY, runtimeException.getMessage(), runtimeException);
-        return ResponseEntity.status(apiError.getStatus()).body(apiError);
+    public ErrorResponse handleRuntimeException(RuntimeException e) {
+        return ErrorResponse.builder(e, HttpStatus.BAD_GATEWAY, e.getMessage()).title("Runtime Exception")
+                .property("timestamp", Instant.now()).build();
+    }
+
+    @ExceptionHandler(ServiceException.class)
+    public ErrorResponse handleServiceException(ServiceException e) {
+        return ErrorResponse.builder(e, HttpStatus.BAD_GATEWAY, e.getMessage()).title("Service Exception")
+                .property("timestamp", Instant.now()).build();
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Object> handleValidationException(ValidationException validationException) {
-        ApiError apiError = new ApiError(HttpStatus.CONFLICT, validationException.getMessage(), validationException);
-        apiError.setSubErrors(validationException.getViolations().stream().map(ApiValidationError::new).toList());
-        return ResponseEntity.status(apiError.getStatus()).body(apiError);
+    public ErrorResponse handleValidationException(ValidationException e) {
+        return ErrorResponse.builder(e, HttpStatus.CONFLICT, e.getMessage()).title("Validation Exception")
+                .property("violations", e.getViolations()).property("timestamp", Instant.now()).build();
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Object> handleEntityDoesNotExistsException(
-            EntityNotFoundException entityNotFoundException) {
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, entityNotFoundException.getMessage(),
-                entityNotFoundException);
-        return ResponseEntity.status(apiError.getStatus()).body(apiError);
+    public ErrorResponse handleEntityNotFoundException(EntityNotFoundException e) {
+        return ErrorResponse.builder(e, HttpStatus.NOT_FOUND, e.getMessage()).title("EntityNotFound Exception")
+                .property("timestamp", Instant.now()).build();
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
-    public ResponseEntity<Object> handleEntityAlreadyExistsException(
-            EntityAlreadyExistsException entityAlreadyExistsException) {
-        ApiError apiError = new ApiError(HttpStatus.CONFLICT, entityAlreadyExistsException.getMessage(),
-                entityAlreadyExistsException);
-        return ResponseEntity.status(apiError.getStatus()).body(apiError);
+    public ErrorResponse handleEntityAlreadyExistsException(EntityAlreadyExistsException e) {
+        return ErrorResponse.builder(e, HttpStatus.CONFLICT, e.getMessage()).title("EntityAlreadyExists Exception")
+                .property("timestamp", Instant.now()).build();
     }
 }
