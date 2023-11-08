@@ -43,7 +43,7 @@ public class CarController {
     @GetMapping("/{carId}")
     @ResponseStatus(HttpStatus.OK)
     public CarDTO getById(@PathVariable Long carId) {
-        return carService.findByIdAsDTO(carId);
+        return carService.findById(carId);
     }
 
     @GetMapping
@@ -57,7 +57,7 @@ public class CarController {
                                     @RequestParam(required = false) List<String> car) {
         if (car == null) car = new ArrayList<>();
         Pageable pageable = PaginationSortingUtils.getPageable(limit, offset, sort);
-        return carService.findAllAsDTO(make, year, model, car, pageable);
+        return carService.findAll(make, year, model, car, pageable);
     }
 
 }

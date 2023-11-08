@@ -39,7 +39,7 @@ public class MakeController {
     @GetMapping("/{makeId}")
     @ResponseStatus(HttpStatus.OK)
     public MakeDTO getById(@PathVariable Long makeId) {
-        return makeService.findByIdAsDTO(makeId);
+        return makeService.findById(makeId);
     }
 
     @GetMapping
@@ -48,7 +48,7 @@ public class MakeController {
                                     @RequestParam(defaultValue = "0") int offset,
                                     @RequestParam(defaultValue = "id,asc") String[] sort) {
         Pageable pageable = PaginationSortingUtils.getPageable(limit, offset, sort);
-        return makeService.findAllAsDTO(pageable);
+        return makeService.findAll(pageable);
     }
 
 }

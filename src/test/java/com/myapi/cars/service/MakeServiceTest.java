@@ -1,5 +1,7 @@
 package com.myapi.cars.service;
 
+import com.myapi.cars.converter.MakeFromMakeDTOUpdater;
+import com.myapi.cars.dto.MakeDTO;
 import com.myapi.cars.exception.EntityAlreadyExistsException;
 import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
@@ -19,12 +21,11 @@ import org.springframework.data.jpa.repository.query.BadJpqlGrammarException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 public class MakeServiceTest {
@@ -37,15 +38,21 @@ public class MakeServiceTest {
     @Mock
     private MakeEntityValidator makeEntityValidator;
 
+    @Mock
+    private ConverterService converterService;
+
+    @Mock
+    private MakeFromMakeDTOUpdater makeFromMakeDTOUpdater;
+
     @BeforeEach
     public void setUp() {
-        makeService = new MakeService(makeRepository, makeEntityValidator);
+        makeService = new MakeService(makeRepository, makeEntityValidator, converterService, makeFromMakeDTOUpdater);
     }
 
     @ParameterizedTest
     @NullSource
-    public void create_whenEntityIsNull_throwIllegalArgumentException(Make nullMake) {
-        assertThrows(IllegalArgumentException.class, () -> makeService.create(nullMake));
+    public void create_whenEntityIsNull_throwIllegalArgumentException(MakeDTO nullMakeDTO) {
+        assertThrows(IllegalArgumentException.class, () -> makeService.create(nullMakeDTO));
 
         verifyNoInteractions(makeRepository);
         verifyNoInteractions(makeEntityValidator);
@@ -53,18 +60,25 @@ public class MakeServiceTest {
 
     @Test
     public void create_whenRepositoryThrowsExceptionExtendsDataAccessException_throwServiceException() {
-        doThrow(BadJpqlGrammarException.class).when(makeRepository).save(any());
+        doThrow(BadJpqlGrammarException.class).when(makeRepository).existsById(any());
 
-        assertThrows(ServiceException.class, () -> makeService.create(new Make()));
+        MakeDTO makeDTO = MakeDTO.builder().id(1L).build();
+        Make make = Make.builder().id(1L).build();
 
-        verify(makeRepository).save(any());
+        when(converterService.convert(makeDTO, Make.class)).thenReturn(make);
+
+        assertThrows(ServiceException.class, () -> makeService.create(makeDTO));
+
+        verify(makeEntityValidator).validate(any());
+        verify(makeRepository).existsById(any());
+        verifyNoMoreInteractions(makeRepository);
     }
 
     @Test
     public void create_whenValidatorThrowsValidationException_throwValidationException() {
         doThrow(ValidationException.class).when(makeEntityValidator).validate(any());
 
-        assertThrows(ValidationException.class, () -> makeService.create(new Make()));
+        assertThrows(ValidationException.class, () -> makeService.create(new MakeDTO()));
 
         verify(makeEntityValidator).validate(any());
     }
@@ -73,27 +87,42 @@ public class MakeServiceTest {
     public void create_whenEntityAlreadyExists_throwEntityAlreadyExistsException() {
         when(makeRepository.existsById(any())).thenReturn(true);
 
-        Make make = new Make();
-        make.setId(1L);
+        MakeDTO makeDTO = MakeDTO.builder().id(1L).build();
+        Make make = Make.builder().id(1L).build();
 
-        assertThrows(EntityAlreadyExistsException.class, () -> makeService.create(make));
+        when(converterService.convert(makeDTO, Make.class)).thenReturn(make);
+
+        assertThrows(EntityAlreadyExistsException.class, () -> makeService.create(makeDTO));
 
         verify(makeEntityValidator).validate(any());
     }
 
     @Test
     public void create_success() {
-        Make make = new Make();
-        assertEquals(make.getId(), makeService.create(make));
+        MakeDTO makeDTO = MakeDTO.builder().id(1L).build();
+        Make make = Make.builder().id(1L).build();
+
+        when(converterService.convert(makeDTO, Make.class)).thenReturn(make);
+        when(makeRepository.save(any())).thenReturn(make);
+        when(makeRepository.existsById(any())).thenReturn(false);
+
+        assertEquals(makeDTO.getId(), makeService.create(makeDTO));
 
         verify(makeRepository).save(make);
+        verify(makeRepository).existsById(any());
+        verifyNoMoreInteractions(makeRepository);
+
         verify(makeEntityValidator).validate(make);
+        verifyNoMoreInteractions(makeEntityValidator);
+
+        verify(converterService).convert(makeDTO, Make.class);
+        verifyNoMoreInteractions(converterService);
     }
 
     @ParameterizedTest
     @NullSource
-    public void update_whenEntityIsNull_throwIllegalArgumentException(Make nullMake) {
-        assertThrows(IllegalArgumentException.class, () -> makeService.update(nullMake));
+    public void update_whenEntityIsNull_throwIllegalArgumentException(MakeDTO nullMakeDTO) {
+        assertThrows(IllegalArgumentException.class, () -> makeService.update(nullMakeDTO, 1L));
 
         verifyNoInteractions(makeRepository);
         verifyNoInteractions(makeEntityValidator);
@@ -101,48 +130,74 @@ public class MakeServiceTest {
 
     @Test
     public void update_whenRepositoryThrowsExceptionExtendsDataAccessException_throwServiceException() {
-        when(makeRepository.existsById(any())).thenReturn(true);
-        doThrow(BadJpqlGrammarException.class).when(makeRepository).save(any());
+        doThrow(BadJpqlGrammarException.class).when(makeRepository).findById(any());
 
-        Make make = new Make();
-        make.setId(1L);
+        MakeDTO makeDTO = MakeDTO.builder().id(1L).build();
 
-        assertThrows(ServiceException.class, () -> makeService.update(make));
+        assertThrows(ServiceException.class, () -> makeService.update(makeDTO, 1L));
 
-        verify(makeRepository).save(any());
+        verify(makeRepository).findById(any());
+        verifyNoMoreInteractions(makeRepository);
     }
 
     @Test
     public void update_whenValidatorThrowsValidationException_throwValidationException() {
+        MakeDTO makeDTO = MakeDTO.builder().id(1L).build();
+        Make make = Make.builder().id(1L).build();
+
+        when(makeRepository.findById(any())).thenReturn(Optional.ofNullable(make));
         doThrow(ValidationException.class).when(makeEntityValidator).validate(any());
 
-        Make make = new Make();
-        make.setId(1L);
-
-        assertThrows(ValidationException.class, () -> makeService.update(make));
+        assertThrows(ValidationException.class, () -> makeService.update(makeDTO, 1L));
 
         verify(makeEntityValidator).validate(any());
+
+        verify(makeRepository).findById(any());
+        verifyNoMoreInteractions(makeRepository);
+
+        verify(makeFromMakeDTOUpdater).update(any(), any());
+        verifyNoMoreInteractions(makeFromMakeDTOUpdater);
+
+        verifyNoInteractions(converterService);
     }
 
     @Test
-    public void update_whenEntityDoesNotExists_throwEntityAlreadyExistsException() {
-        when(makeRepository.existsById(any())).thenReturn(false);
+    public void update_whenEntityDoesNotExists_throwEntityNotFoundException() {
+        when(makeRepository.findById(any())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> makeService.update(new Make()));
+        assertThrows(EntityNotFoundException.class, () -> makeService.update(new MakeDTO(), 1L));
 
-        verify(makeEntityValidator).validate(any());
+        verify(makeRepository).findById(any());
+        verifyNoMoreInteractions(makeRepository);
+
+        verifyNoInteractions(makeFromMakeDTOUpdater);
+        verifyNoInteractions(converterService);
+        verifyNoInteractions(makeEntityValidator);
     }
 
     @Test
     public void update_success() {
-        when(makeRepository.existsById(any())).thenReturn(true);
+        MakeDTO makeDTO = MakeDTO.builder().id(1L).build();
+        Make make = Make.builder().id(1L).build();
 
-        Make make = new Make();
-        make.setId(1L);
-        assertEquals(make, makeService.update(make));
+        when(makeRepository.findById(any())).thenReturn(Optional.ofNullable(make));
+        when(makeRepository.save(any())).thenReturn(make);
+        when(converterService.convert(make, MakeDTO.class)).thenReturn(makeDTO);
 
+        assertEquals(makeDTO, makeService.update(makeDTO, 1L));
+
+        verify(makeRepository).findById(any());
         verify(makeRepository).save(make);
+        verifyNoMoreInteractions(makeRepository);
+
         verify(makeEntityValidator).validate(make);
+        verifyNoMoreInteractions(makeEntityValidator);
+
+        verify(makeFromMakeDTOUpdater).update(makeDTO, make);
+        verifyNoMoreInteractions(makeFromMakeDTOUpdater);
+
+        verify(converterService).convert(make, MakeDTO.class);
+        verifyNoMoreInteractions(converterService);
     }
 
     @Test
@@ -201,8 +256,43 @@ public class MakeServiceTest {
     public void findAll_success() {
         when(makeRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
-        makeService.findAll(Pageable.unpaged());
+        Pageable pageable = mock(Pageable.class);
+        when(pageable.getSort()).thenReturn(mock(org.springframework.data.domain.Sort.class));
+
+        assertDoesNotThrow(() -> makeService.findAll(pageable));
 
         verify(makeRepository).findAll(any(Pageable.class));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    public void findById_whenIdIsNull_throwIllegalArgumentException(Long nullId) {
+        assertThrows(IllegalArgumentException.class, () -> makeService.findById(nullId));
+    }
+
+    @Test
+    public void findById_whenMakeRepositoryThrowsExceptionExtendsDataAccessException_throwServiceException() {
+        doThrow(BadJpqlGrammarException.class).when(makeRepository).findById(any());
+
+        assertThrows(ServiceException.class, () -> makeService.findById(1L));
+
+        verify(makeRepository).findById(any());
+    }
+
+    @Test
+    public void findById_success() {
+        Make make = Make.builder().id(1L).build();
+        MakeDTO makeDTO = MakeDTO.builder().id(1L).build();
+
+        when(makeRepository.findById(any())).thenReturn(Optional.ofNullable(make));
+        when(converterService.convert(make, MakeDTO.class)).thenReturn(makeDTO);
+
+        assertEquals(makeDTO, makeService.findById(1L));
+
+        verify(makeRepository).findById(any());
+        verifyNoMoreInteractions(makeRepository);
+
+        verify(converterService).convert(make, MakeDTO.class);
+        verifyNoMoreInteractions(converterService);
     }
 }

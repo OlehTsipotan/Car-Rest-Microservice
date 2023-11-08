@@ -73,7 +73,7 @@ public class CategoryService {
         log.info("Deleted id = {}", id);
     }
 
-    public DTOSearchResponse findAllAsDTO(@NonNull Pageable pageable) {
+    public DTOSearchResponse findAll(@NonNull Pageable pageable) {
         List<CategoryDTO> categoryDTOList =
                 execute(() -> categoryRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
         log.debug("Retrieved All {} Categorys", categoryDTOList.size());
@@ -81,7 +81,7 @@ public class CategoryService {
                 .total(categoryDTOList.size()).sort(pageable.getSort().toString()).data(categoryDTOList).build();
     }
 
-    public CategoryDTO findByIdAsDTO(@NonNull Long id) {
+    public CategoryDTO findById(@NonNull Long id) {
         Category category = execute(() -> categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no Category with id = " + id)));
         log.debug("Retrieved Category by id = {}", id);

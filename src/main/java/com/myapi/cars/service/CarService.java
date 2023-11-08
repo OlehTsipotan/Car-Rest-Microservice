@@ -73,16 +73,8 @@ public class CarService {
         log.info("Deleted id = {}", id);
     }
 
-    public DTOSearchResponse findAllAsDTO(@NonNull Pageable pageable) {
-        List<CarDTO> carDTOList =
-                execute(() -> carRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-        log.debug("Retrieved All {} Cars", carDTOList.size());
-        return DTOSearchResponse.builder().offset(pageable.getOffset()).limit(pageable.getPageSize())
-                .total(carDTOList.size()).sort(pageable.getSort().toString()).data(carDTOList).build();
-    }
-
-    public DTOSearchResponse findAllAsDTO(String makeName, Integer year, String model,
-                                          @NonNull List<String> carNameList, @NonNull Pageable pageable) {
+    public DTOSearchResponse findAll(String makeName, Integer year, String model,
+                                     @NonNull List<String> carNameList, @NonNull Pageable pageable) {
         List<CarDTO> carDTOList =
                 execute(() -> carRepository.findAll(makeName, year, model, carNameList, carNameList.size(),
                         pageable)).stream().map(this::convertToDTO).toList();
@@ -92,7 +84,7 @@ public class CarService {
 
     }
 
-    public CarDTO findByIdAsDTO(@NonNull Long id) {
+    public CarDTO findById(@NonNull Long id) {
         Car car = execute(() -> carRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no Car with id = " + id)));
         log.debug("Retrieved Car by id = {}", id);

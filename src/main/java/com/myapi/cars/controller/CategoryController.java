@@ -44,7 +44,7 @@ public class CategoryController {
     @GetMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
     public CategoryDTO getById(@PathVariable Long categoryId) {
-        return categoryService.findByIdAsDTO(categoryId);
+        return categoryService.findById(categoryId);
     }
 
     @GetMapping
@@ -53,7 +53,7 @@ public class CategoryController {
                                     @RequestParam(defaultValue = "0") int offset,
                                     @RequestParam(defaultValue = "id,asc") String[] sort) {
         Pageable pageable = PaginationSortingUtils.getPageable(limit, offset, sort);
-        return categoryService.findAllAsDTO(pageable);
+        return categoryService.findAll(pageable);
     }
 
 }

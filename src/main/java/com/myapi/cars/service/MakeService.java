@@ -73,7 +73,7 @@ public class MakeService {
         log.info("Deleted id = {}", id);
     }
 
-    public DTOSearchResponse findAllAsDTO(@NonNull Pageable pageable) {
+    public DTOSearchResponse findAll(@NonNull Pageable pageable) {
         List<MakeDTO> makeDTOList =
                 execute(() -> makeRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
         log.debug("Retrieved All {} Makes", makeDTOList.size());
@@ -81,7 +81,7 @@ public class MakeService {
                 .total(makeDTOList.size()).sort(pageable.getSort().toString()).data(makeDTOList).build();
     }
 
-    public MakeDTO findByIdAsDTO(@NonNull Long id) {
+    public MakeDTO findById(@NonNull Long id) {
         Make make = execute(() -> makeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no Make with id = " + id)));
         log.debug("Retrieved Make by id = {}", id);
