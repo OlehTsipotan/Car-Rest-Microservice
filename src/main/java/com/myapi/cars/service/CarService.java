@@ -1,5 +1,8 @@
 package com.myapi.cars.service;
 
+import com.myapi.cars.converter.CarFromCarDTOUpdater;
+import com.myapi.cars.dto.CarDTO;
+import com.myapi.cars.dto.DTOSearchResponse;
 import com.myapi.cars.exception.EntityAlreadyExistsException;
 import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
@@ -15,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,8 +29,13 @@ public class CarService {
 
     private final CarEntityValidator carEntityValidator;
 
+    private final ConverterService converterService;
+
+    private final CarFromCarDTOUpdater carFromCarDTOUpdater;
+
     @Transactional
-    public Long create(@NonNull Car car) {
+    public Long create(@NonNull CarDTO carDTO) {
+        Car car = convertToEntity(carDTO);
         execute(() -> {
             carEntityValidator.validate(car);
             if (car.getId() != null && carRepository.existsById(car.getId())) {
@@ -41,16 +48,18 @@ public class CarService {
     }
 
     @Transactional
-    public Car update(@NonNull Car car) {
-        execute(() -> {
+    public CarDTO update(@NonNull CarDTO carDTO, @NonNull Long id) {
+        Car carToUpdate = execute(() -> {
+            Car car = carRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("There is no Car to update with id = " + id));
+
+            carFromCarDTOUpdater.update(carDTO, car);
             carEntityValidator.validate(car);
-            if (car.getId() == null || !carRepository.existsById(car.getId())) {
-                throw new EntityNotFoundException("Car with id = " + car.getId() + " do not exists");
-            }
-            carRepository.save(car);
+
+            return carRepository.save(car);
         });
-        log.info("updated {}", car);
-        return car;
+        log.info("updated {}", carToUpdate);
+        return convertToDTO(carToUpdate);
     }
 
     @Transactional
@@ -64,26 +73,38 @@ public class CarService {
         log.info("Deleted id = {}", id);
     }
 
-    public List<Car> findAll(@NonNull Pageable pageable) {
-        List<Car> cars = execute(() -> carRepository.findAll(pageable)).stream().toList();
-        log.debug("Retrieved All {} Cars", cars.size());
-        return cars;
+    public DTOSearchResponse findAllAsDTO(@NonNull Pageable pageable) {
+        List<CarDTO> carDTOList =
+                execute(() -> carRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} Cars", carDTOList.size());
+        return DTOSearchResponse.builder().offset(pageable.getOffset()).limit(pageable.getPageSize())
+                .total(carDTOList.size()).sort(pageable.getSort().toString()).data(carDTOList).build();
     }
 
-    public List<Car> findAll(String makeName, Integer year, String model, @NonNull List<String> categoryNameList,
-                             @NonNull Pageable pageable) {
-        List<Car> cars =
-                execute(() -> carRepository.findAll(makeName, year, model, categoryNameList, categoryNameList.size(),
-                        pageable)).stream().toList();
-        log.debug("Retrieved All {} Cars", cars.size());
-        return cars;
+    public DTOSearchResponse findAllAsDTO(String makeName, Integer year, String model,
+                                          @NonNull List<String> carNameList, @NonNull Pageable pageable) {
+        List<CarDTO> carDTOList =
+                execute(() -> carRepository.findAll(makeName, year, model, carNameList, carNameList.size(),
+                        pageable)).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} Cars", carDTOList.size());
+        return DTOSearchResponse.builder().offset(pageable.getOffset()).limit(pageable.getPageSize())
+                .total(carDTOList.size()).sort(pageable.getSort().toString()).data(carDTOList).build();
+
     }
 
-    public Car findById(@NonNull Long id) {
+    public CarDTO findByIdAsDTO(@NonNull Long id) {
         Car car = execute(() -> carRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("There is no Make with id = " + id)));
+                .orElseThrow(() -> new EntityNotFoundException("There is no Car with id = " + id)));
         log.debug("Retrieved Car by id = {}", id);
-        return car;
+        return convertToDTO(car);
+    }
+
+    private CarDTO convertToDTO(Car car) {
+        return converterService.convert(car, CarDTO.class);
+    }
+
+    private Car convertToEntity(CarDTO carDTO) {
+        return converterService.convert(carDTO, Car.class);
     }
 
     private <T> T execute(DaoSupplier<T> supplier) {

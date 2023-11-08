@@ -1,5 +1,8 @@
 package com.myapi.cars.service;
 
+import com.myapi.cars.converter.CategoryFromCategoryDTOUpdater;
+import com.myapi.cars.dto.CategoryDTO;
+import com.myapi.cars.dto.DTOSearchResponse;
 import com.myapi.cars.exception.EntityAlreadyExistsException;
 import com.myapi.cars.exception.EntityNotFoundException;
 import com.myapi.cars.exception.ServiceException;
@@ -26,8 +29,13 @@ public class CategoryService {
 
     private final CategoryEntityValidator categoryEntityValidator;
 
+    private final ConverterService converterService;
+
+    private final CategoryFromCategoryDTOUpdater categoryFromCategoryDTOUpdater;
+
     @Transactional
-    public Long create(@NonNull Category category) {
+    public Long create(@NonNull CategoryDTO categoryDTO) {
+        Category category = convertToEntity(categoryDTO);
         execute(() -> {
             categoryEntityValidator.validate(category);
             if (category.getId() != null && categoryRepository.existsById(category.getId())) {
@@ -40,16 +48,18 @@ public class CategoryService {
     }
 
     @Transactional
-    public Category update(@NonNull Category category) {
-        execute(() -> {
+    public CategoryDTO update(@NonNull CategoryDTO categoryDTO, @NonNull Long id) {
+        Category categoryToUpdate = execute(() -> {
+            Category category = categoryRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("There is no Category to update with id = " + id));
+
+            categoryFromCategoryDTOUpdater.update(categoryDTO, category);
             categoryEntityValidator.validate(category);
-            if (category.getId() == null || !categoryRepository.existsById(category.getId())) {
-                throw new EntityNotFoundException("Category with id = " + category.getId() + " do not exists");
-            }
-            categoryRepository.save(category);
+
+            return categoryRepository.save(category);
         });
-        log.info("updated {}", category);
-        return category;
+        log.info("updated {}", categoryToUpdate);
+        return convertToDTO(categoryToUpdate);
     }
 
     @Transactional
@@ -63,20 +73,30 @@ public class CategoryService {
         log.info("Deleted id = {}", id);
     }
 
-    public List<Category> findAll(@NonNull Pageable pageable) {
-        List<Category> categories = execute(() -> categoryRepository.findAll(pageable)).stream().toList();
-        log.debug("Retrieved All {} Categories", categories.size());
-        return categories;
+    public DTOSearchResponse findAllAsDTO(@NonNull Pageable pageable) {
+        List<CategoryDTO> categoryDTOList =
+                execute(() -> categoryRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} Categorys", categoryDTOList.size());
+        return DTOSearchResponse.builder().offset(pageable.getOffset()).limit(pageable.getPageSize())
+                .total(categoryDTOList.size()).sort(pageable.getSort().toString()).data(categoryDTOList).build();
     }
 
-    public Category findById(@NonNull Long id) {
+    public CategoryDTO findByIdAsDTO(@NonNull Long id) {
         Category category = execute(() -> categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no Category with id = " + id)));
-        log.debug("Retrieved Category {}", category);
-        return category;
+        log.debug("Retrieved Category by id = {}", id);
+        return convertToDTO(category);
     }
 
-    private <T> T execute(com.myapi.cars.service.MakeService.DaoSupplier<T> supplier) {
+    private CategoryDTO convertToDTO(Category category) {
+        return converterService.convert(category, CategoryDTO.class);
+    }
+
+    private Category convertToEntity(CategoryDTO categoryDTO) {
+        return converterService.convert(categoryDTO, Category.class);
+    }
+
+    private <T> T execute(DaoSupplier<T> supplier) {
         try {
             return supplier.get();
         } catch (DataAccessException e) {
@@ -84,7 +104,7 @@ public class CategoryService {
         }
     }
 
-    private void execute(com.myapi.cars.service.MakeService.DaoProcessor processor) {
+    private void execute(DaoProcessor processor) {
         try {
             processor.process();
         } catch (DataAccessException e) {
