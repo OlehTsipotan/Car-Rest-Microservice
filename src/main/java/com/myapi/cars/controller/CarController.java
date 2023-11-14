@@ -24,7 +24,6 @@ public class CarController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Long create(@RequestBody CarDTO carDTO) {
-        System.out.println("carDTO = " + carDTO);
         return carService.create(carDTO);
     }
 
@@ -54,10 +53,10 @@ public class CarController {
                                             @RequestParam(required = false) String make,
                                             @RequestParam(required = false) Integer year,
                                             @RequestParam(required = false) String model,
-                                    @RequestParam(required = false) List<String> car) {
-        if (car == null) car = new ArrayList<>();
+                                    @RequestParam(required = false) List<String> cars) {
+        if (cars == null) cars = new ArrayList<>();
         Pageable pageable = PaginationSortingUtils.getPageable(limit, offset, sort);
-        return carService.findAll(make, year, model, car, pageable);
+        return carService.findAll(make, year, model, cars, pageable);
     }
 
 }
