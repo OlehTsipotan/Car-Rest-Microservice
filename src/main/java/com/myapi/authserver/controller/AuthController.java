@@ -1,10 +1,10 @@
 package com.myapi.authserver.controller;
 
 import com.myapi.authserver.client.AuthClient;
+import com.myapi.authserver.converter.PasswordAuthenticationRequestBodyFromUserCredentialsConverter;
 import com.myapi.authserver.model.AuthenticationTokenResponse;
 import com.myapi.authserver.model.PasswordAuthenticationRequestBody;
 import com.myapi.authserver.model.UserCredentials;
-import com.myapi.authserver.converter.PasswordAuthenticationRequestBodyFromUserCredentialsConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
