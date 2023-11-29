@@ -23,10 +23,8 @@ public class AuthController {
 
     @PostMapping("/token")
     public AuthenticationTokenResponse getToken(@RequestBody UserCredentials userAuthenticationCredentials) {
-        log.info("AuthController.getToken() userAuthenticationCredentials: {}", userAuthenticationCredentials);
         PasswordAuthenticationRequestBody passwordAuthenticationRequestBody =
                 passwordAuthenticationRequestBodyFromUserCredentialsConverter.convert(userAuthenticationCredentials);
-        log.info(passwordAuthenticationRequestBody.toString());
         return authClient.getToken(passwordAuthenticationRequestBody);
     }
 }
