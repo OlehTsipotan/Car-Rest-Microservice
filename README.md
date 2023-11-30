@@ -1,4 +1,4 @@
-### This README file is intended to be read only by *Dmytro Karmano*
+### This README file is intended to be read only by *Dmytro Karmanov*
 
 **The only existed user credentials are:**
 > - Username: *admin*
