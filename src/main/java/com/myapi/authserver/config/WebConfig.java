@@ -1,6 +1,6 @@
 package com.myapi.authserver.config;
 
-import com.myapi.authserver.client.AuthClient;
+import com.myapi.authserver.client.Auth0Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ public class WebConfig {
     }
 
     @Bean
-    AuthClient authClient(HttpServiceProxyFactory httpServiceProxyFactory) {
-        return httpServiceProxyFactory.createClient(AuthClient.class);
+    Auth0Client authClient(HttpServiceProxyFactory httpServiceProxyFactory) {
+        return httpServiceProxyFactory.createClient(Auth0Client.class);
     }
 }
