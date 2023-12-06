@@ -1,5 +1,7 @@
 package com.myapi.authserver.handler;
 
+import com.myapi.authserver.exception.RestClientException;
+import com.myapi.authserver.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,13 +19,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ErrorResponse handleRuntimeException(RuntimeException e) {
+        log.error("RuntimeException: {}", e.getMessage());
         return ErrorResponse.builder(e, HttpStatus.BAD_GATEWAY, e.getMessage()).title("Runtime Exception")
                 .property("timestamp", Instant.now()).build();
     }
 
     @ExceptionHandler(HttpClientErrorException.class)
     public ErrorResponse handleHttpClientErrorException(HttpClientErrorException e) {
+        log.error("HttpClientErrorException: {}", e.getMessage());
         return ErrorResponse.builder(e, e.getStatusCode(), e.getMessage()).title("HttpClientError Exception")
+                .property("timestamp", Instant.now()).build();
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    public ErrorResponse handleRestClientException(RestClientException e) {
+        log.error("RestClientException: {}", e.getMessage());
+        return ErrorResponse.builder(e, e.getStatusCode(), e.getMessage()).title("RestClient Exception")
+                .property("response", e.getResponseMessage())
                 .property("timestamp", Instant.now()).build();
     }
 }

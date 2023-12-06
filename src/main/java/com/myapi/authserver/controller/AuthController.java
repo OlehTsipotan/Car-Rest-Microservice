@@ -1,10 +1,8 @@
 package com.myapi.authserver.controller;
 
-import com.myapi.authserver.client.AuthClient;
-import com.myapi.authserver.converter.PasswordAuthenticationRequestBodyFromUserCredentialsConverter;
 import com.myapi.authserver.model.AuthenticationTokenResponse;
-import com.myapi.authserver.model.PasswordAuthenticationRequestBody;
 import com.myapi.authserver.model.UserCredentials;
+import com.myapi.authserver.service.Auth0Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,15 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthController {
 
-    private final AuthClient authClient;
-
-    private final PasswordAuthenticationRequestBodyFromUserCredentialsConverter
-            passwordAuthenticationRequestBodyFromUserCredentialsConverter;
+    private final Auth0Service auth0Service;
 
     @PostMapping("/token")
-    public AuthenticationTokenResponse getToken(@RequestBody UserCredentials userAuthenticationCredentials) {
-        PasswordAuthenticationRequestBody passwordAuthenticationRequestBody =
-                passwordAuthenticationRequestBodyFromUserCredentialsConverter.convert(userAuthenticationCredentials);
-        return authClient.getToken(passwordAuthenticationRequestBody);
+    public AuthenticationTokenResponse getToken(@RequestBody UserCredentials userCredentials) {
+        return auth0Service.getToken(userCredentials);
     }
 }
