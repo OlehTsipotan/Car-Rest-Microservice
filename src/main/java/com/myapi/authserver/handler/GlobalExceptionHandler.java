@@ -24,6 +24,20 @@ public class GlobalExceptionHandler {
                 .property("timestamp", Instant.now()).build();
     }
 
+    @ExceptionHandler
+    public ErrorResponse handleServiceException(ServiceException e) {
+        log.error("ServiceException: {}", e.getMessage());
+        return ErrorResponse.builder(e, HttpStatus.BAD_GATEWAY, e.getMessage()).title("Service Exception")
+                .property("timestamp", Instant.now()).build();
+    }
+
+    @ExceptionHandler
+    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("IllegalArgumentException: {}", e.getMessage());
+        return ErrorResponse.builder(e, HttpStatus.BAD_REQUEST, e.getMessage()).title("IllegalArgument Exception")
+                .property("timestamp", Instant.now()).build();
+    }
+
     @ExceptionHandler(HttpClientErrorException.class)
     public ErrorResponse handleHttpClientErrorException(HttpClientErrorException e) {
         log.error("HttpClientErrorException: {}", e.getMessage());
