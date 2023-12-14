@@ -11,6 +11,8 @@ local.properties
 .loadpath
 .recommenders
 
+*.pem
+
 #Custom
 .idea
 .mvn

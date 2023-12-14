@@ -1,14 +1,17 @@
 package com.myapi.cars.controller;
 
+import com.myapi.cars.config.WebTestConfig;
 import com.myapi.cars.dto.DTOSearchResponse;
 import com.myapi.cars.dto.CarDTO;
-import com.myapi.cars.model.Car;
 import com.myapi.cars.service.CarService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +25,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest({CarController.class})
+@WithMockUser
+@Import(WebTestConfig.class)
+@ActiveProfiles(value = "test")
 public class CarControllerTest {
 
     @Autowired
