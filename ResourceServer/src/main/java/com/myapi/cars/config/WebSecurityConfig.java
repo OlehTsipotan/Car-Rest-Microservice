@@ -25,7 +25,10 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
-                auth -> auth.requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll().anyRequest().authenticated());
+                auth -> auth
+                        .requestMatchers(HttpMethod.GET).permitAll()
+                        .requestMatchers("/api/v1/**").authenticated()
+                        .anyRequest().permitAll());
         http.oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.decoder(jwtDecoder())));
         return http.build();
     }
