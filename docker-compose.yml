@@ -1,0 +1,36 @@
+version: '2'
+services:
+  auth-server:
+    container_name: Auth-Server
+    build:
+      context: AuthServer
+      dockerfile: Dockerfile
+    image: authserver
+    ports:
+      - 8081:8081
+    environment:
+      AUTH0_CLIENT_ID: zyY5TgD5Q8fQwpKQkdEmKXuIvVcUtg8i
+      AUTH0_CLIENT_SECRET: h48G8n_Ggs1J3xu1FPT8a5iwlS7qrfALO4WHNFWgkmLG-rnqtfhWyieW5Q4W1jZT
+  resource-server:
+    container_name: Resource-Server
+    build:
+      context: ResourceServer
+      dockerfile: Dockerfile
+    image: resourceserver
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/cardb
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: mypassword
+  postgres:
+    container_name: db
+    image: postgres:15.2
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: cardb
+    ports:
+      - "5432:5432"
