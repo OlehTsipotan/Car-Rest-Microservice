@@ -1,5 +1,18 @@
+FROM eclipse-temurin:17-jdk-jammy as build
+WORKDIR /workspace/app
+
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
+
+RUN ./mvnw install
+RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+
 FROM eclipse-temurin:17-jdk-jammy
-MAINTAINER Oleh Tsipotan
-COPY target/authserver-0.1.jar .
-EXPOSE 8081
-ENTRYPOINT ["java","-jar","authserver-0.1.jar"]
+VOLUME /tmp
+ARG DEPENDENCY=/workspace/app/target/dependency
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.myapi.authserver.AuthserverApplication"]
