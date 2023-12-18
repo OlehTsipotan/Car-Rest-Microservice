@@ -5,6 +5,7 @@ tmp/
 *.tmp
 *.bak
 *.swp
+*.cmd
 *~.nib
 local.properties
 .settings/
@@ -15,7 +16,6 @@ local.properties
 
 #Custom
 .idea
-.mvn
 .jpb
 
 # External tool builders
@@ -71,7 +71,6 @@ local.properties
 *.ctxt
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
@@ -82,21 +81,6 @@ local.properties
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-
-### Maven ###
-mvnw.*
-mvnw
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-# https://github.com/takari/maven-wrapper#usage-without-binary-jar
-.mvn/wrapper/maven-wrapper.jar
 
 # Eclipse m2e generated files
 # Eclipse Core
