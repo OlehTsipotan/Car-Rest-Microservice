@@ -55,24 +55,7 @@ git clone git@github.com:OlehTsipotan/Car-Rest-Microservice.git
 ```
 
 ### Running
-
-1. Build executable Jar files
-```sh
-cd AuthServer
-```
-```sh
-./mvnw package
-```
----
-
-```sh
-cd ResourceServer
-```
-```sh
-./mvnw package
-```
-
-2. Run throught Docker
+Run out the box by Docker Compose
 ```sh
 docker-compose up
 ```
