@@ -28,9 +28,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ServiceException.class)
-    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ErrorResponse handleServiceException(ServiceException e) {
-        return ErrorResponse.builder(e, HttpStatus.BAD_GATEWAY, e.getMessage()).title("Service Exception")
+        return ErrorResponse.builder(e, HttpStatus.SERVICE_UNAVAILABLE, e.getMessage()).title("Service Exception")
                 .property("timestamp", Instant.now()).build();
     }
 
