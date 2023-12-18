@@ -1,8 +1,8 @@
 FROM eclipse-temurin:17-jdk-jammy as build
 WORKDIR /workspace/app
 
-COPY mvnw .
-COPY .mvn .mvn
+#COPY mvnw .
+#COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
