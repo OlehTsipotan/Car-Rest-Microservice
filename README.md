@@ -25,8 +25,10 @@ Also, Microservice architecture allows easily separate main duties and guarantee
     - [Spring Data JPA](https://spring.io/projects/spring-data-jpa) - Provides a simple and consistent programming model for data access.
     - [Spring Security](https://spring.io/projects/spring-security) - Provides comprehensive security services for Java EE-based enterprise software applications.
     - [Spring MVC](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html) - The web module of the Spring framework that simplifies the work needed to develop web applications.
+    - [OAuth 2.0](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html) - Spring Security provides comprehensive OAuth 2.0 support.
   - [PostgreSQL](https://www.postgresql.org/) - An open-source relational database system.
-
+  - [SpringDoc](https://springdoc.org/) - Library helps to automate the generation of API documentation using spring boot projects
+  - 
 - **Testing**:
   - [Mockito](https://site.mockito.org/) - Mockito is a mocking framework that tastes really good.
   - [JUnit 5](https://junit.org/junit5/) - A programming and testing model for Java applications.
@@ -45,17 +47,17 @@ Also, Microservice architecture allows easily separate main duties and guarantee
 ## How to Install and Run the Project
 ### Prerequisites:
 
-Java 11 or higher and Docker installed.
+- Installed Docker
 
 ### Installing 
-1. Clone the repo
+- Clone the repo
 
 ```sh
 git clone git@github.com:OlehTsipotan/Car-Rest-Microservice.git
 ```
 
 ### Running
-Run out the box by Docker Compose
+- Run out the box by Docker Compose
 ```sh
 docker-compose up
 ```
