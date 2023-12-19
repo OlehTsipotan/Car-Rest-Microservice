@@ -28,7 +28,7 @@ Also, Microservice architecture allows easily separate main duties and guarantee
     - [OAuth 2.0](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html) - Spring Security provides comprehensive OAuth 2.0 support.
   - [PostgreSQL](https://www.postgresql.org/) - An open-source relational database system.
   - [SpringDoc](https://springdoc.org/) - Library helps to automate the generation of API documentation using spring boot projects
-  - 
+    
 - **Testing**:
   - [Mockito](https://site.mockito.org/) - Mockito is a mocking framework that tastes really good.
   - [JUnit 5](https://junit.org/junit5/) - A programming and testing model for Java applications.
