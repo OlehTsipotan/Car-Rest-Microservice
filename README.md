@@ -5,8 +5,7 @@ This is a demonstrative Java Spring Boot project which is built in a microservic
 ## Table of Contents
 - [Project Description](#project-description)
 - [Technology Stack](#technology-stack)
-- [Resource Service](#resource-service)
-- [Authentication Service](#authentication-service)
+- [Services](#services)
 - [Technology Stack](#technology-stack)
 - [How to Install and Run the Project](#how-to-install-and-run-the-project)
 - [Credits](#credits)
@@ -42,7 +41,9 @@ Also, Microservice architecture allows easily separate main duties and guarantee
 - **Containerization and Deployment**:
   - [Docker](https://www.docker.com/) - A platform for developing, shipping, and running applications.
 
-
+## Services
+- ### [ResourceServer](https://github.com/OlehTsipotan/Car-Rest-Microservice/tree/main/ResourceServer)
+- ### [AuthServer](https://github.com/OlehTsipotan/Car-Rest-Microservice/tree/main/AuthServer)
 
 ## How to Install and Run the Project
 ### Prerequisites:
